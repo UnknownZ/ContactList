@@ -1,43 +1,93 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+
+			URL: "https://playground.4geeks.com/apis/fake/contact/",
+			agenda: "agenda/test",
+			contacts: [],
+			currentContact: "",
+			nameTest: /^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/ ,
+			phoneTest: /^[0-9]*$/ ,
+			addressTest: /^\s*\S+(?:\s+\S+){2}/  ,
+			emailTest: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ ,
+
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
+			loadContacts: async (method) => {
+				const store = getStore()
+				let list = []
+				let response
+				let headersList = {
+					"Content-Type": "application/json"
+				}
+				response = await fetch(store.URL + store.agenda, {
+					method: "GET",
+					headers: headersList	
 				});
 
-				//reset the global store
-				setStore({ demo: demo });
-			}
+				let data = await response.json();
+				data.map((contact) =>{
+					list.push(contact)
+				})
+				setStore({contacts: list})
+			},
+
+			saveContact: (body) => {
+				const store = getStore()
+				let response = fetch(store.URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(body)
+				});
+				return response
+			},
+
+			validateData: (fullName, address, email, phone) => {
+				const store = getStore()
+				if(fullName === "" || !store.nameTest.test(fullName))
+					return false
+				else if(!store.addressTest.test(address) || address==="")
+					return false
+				else if(!store.emailTest.test(email) || email === "")
+					return false
+				else if(!store.phoneTest.test(phone) || phone === "")
+					return false
+				else 
+					return true			
+			},
+
+			deleteContact: (id) => {
+				const store = getStore()
+				console.log(store.URL+id)
+				let response = fetch(store.URL+id, {
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json"
+					},
+				});
+				return response
+			},
+
+			setCurrentContact: (id) => {
+                setStore({
+                    currentContact: id
+                })
+            },
+
+			updateContact: (id, body) => {
+				const store = getStore()
+				console.log(store.URL+id)
+				let response = fetch(store.URL+id, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(body)
+				});
+				return response
+			},
 		}
 	};
 };
