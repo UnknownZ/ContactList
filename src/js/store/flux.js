@@ -6,10 +6,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 			agenda: "agenda/test",
 			contacts: [],
 			currentContact: "",
-			nameTest: /^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/ ,
-			phoneTest: /^[0-9]*$/ ,
-			addressTest: /^\s*\S+(?:\s+\S+){2}/  ,
-			emailTest: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ ,
+			nameTest: /^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/,
+			phoneTest: /^[0-9]*$/,
+			addressTest: /^\w+\s+\d/,
+			emailTest: /^\w+([\.-]?\w+)*\d@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
 
 		},
 		actions: {
@@ -22,14 +22,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				response = await fetch(store.URL + store.agenda, {
 					method: "GET",
-					headers: headersList	
+					headers: headersList
 				});
 
 				let data = await response.json();
-				data.map((contact) =>{
+				data.map((contact) => {
 					list.push(contact)
 				})
-				setStore({contacts: list})
+				setStore({ contacts: list })
 			},
 
 			saveContact: (body) => {
@@ -46,22 +46,34 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			validateData: (fullName, address, email, phone) => {
 				const store = getStore()
-				if(fullName === "" || !store.nameTest.test(fullName))
+				if (fullName === "" || !store.nameTest.test(fullName)) {
 					return false
-				else if(!store.addressTest.test(address) || address==="")
+				}
+				else if (!store.addressTest.test(address) || address === "") {
 					return false
-				else if(!store.emailTest.test(email) || email === "")
+				}
+				else if (!store.emailTest.test(email) || email === "") {
 					return false
-				else if(!store.phoneTest.test(phone) || phone === "")
+				}
+				else if (!store.phoneTest.test(phone) || phone === "") {
 					return false
-				else 
-					return true			
+				}
+				else {
+					return true
+				}
+			},
+
+			resetData: () => {
+				setStore({ validPhone: false })
+				setStore({ validEmail: false })
+				setStore({ validName: false })
+				setStore({ validAddress: false })
 			},
 
 			deleteContact: (id) => {
 				const store = getStore()
-				console.log(store.URL+id)
-				let response = fetch(store.URL+id, {
+				console.log(store.URL + id)
+				let response = fetch(store.URL + id, {
 					method: "DELETE",
 					headers: {
 						"Content-Type": "application/json"
@@ -71,15 +83,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			setCurrentContact: (id) => {
-                setStore({
-                    currentContact: id
-                })
-            },
+				setStore({
+					currentContact: id
+				})
+			},
 
 			updateContact: (id, body) => {
 				const store = getStore()
-				console.log(store.URL+id)
-				let response = fetch(store.URL+id, {
+				console.log(store.URL + id)
+				let response = fetch(store.URL + id, {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json"

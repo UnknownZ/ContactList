@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -6,11 +6,20 @@ import 'react-toastify/dist/ReactToastify.css'
 
 
 function ContactForm() {
-    const { store: { currentContact }, actions: { saveContact, updateContact, validateData, setCurrentContact } } = useContext(Context)
+    const { store: { currentContact, nameTest, phoneTest, addressTest, emailTest }, actions: { saveContact, updateContact, validateData, setCurrentContact, resetData } } = useContext(Context)
     const [name, setName] = useState("")
     const [phone, setPhone] = useState("")
     const [email, setEmail] = useState("")
     const [address, setAddress] = useState("")
+    const [validName, setValidName] = useState(false)
+    const [validPhone, setValidPhone] = useState(false)
+    const [validAddress, setValidAddress] = useState(false)
+    const [validEmail, setValidEmail] = useState(false)
+
+
+    useEffect(() => {
+        resetData()
+    }, [])
 
     const addContact = async (e) => {
 
@@ -68,43 +77,96 @@ function ContactForm() {
 
     const nameChange = e => {
         setName(e.target.value)
+        if(nameTest.test(name))
+        setValidName(true)
     }
 
     const emailChange = (e) => {
         setEmail(e.target.value)
+        if(emailTest.test(email))
+        setValidEmail(true)
     }
 
     const phoneChange = (e) => {
         setPhone(e.target.value)
+        if(phoneTest.test(phone))
+        setValidPhone(true)
     }
 
     const addressChange = (e) => {
         setAddress(e.target.value)
+        if(addressTest.test(address))
+        setValidAddress(true)
     }
 
     return (
         <div className="text-center mt-5">
-            <h1>Add a new contact</h1>
+            {currentContact == "" ? (
+                <div>
+                    <h1>Adding new contact</h1>
+                </div>
+            ) : (
+                <div>
+                    <h1>Editing contact</h1>
+                </div>
+            )}
+
             <div>
                 <form>
                     <div className="form-group">
                         <label htmlFor="InputName">Full Name</label>
                         <input type="text" className="form-control" value={name} id="InputName" onChange={nameChange} placeholder="Full Name"></input>
+                        {validName ? (
+                            <></>
+                        ) : (
+                            <div>
+                                <div id="NameInvalid" className="form-text">
+                                    Name is invalid
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
                         <label htmlFor="InputEmail">Email</label>
                         <input type="text" className="form-control" value={email} id="InputEmail" onChange={emailChange} placeholder="Enter email"></input>
+                        {validEmail ? (
+                            <></>
+                        ) : (
+                            <div>
+                                <div id="NameInvalid" className="form-text">
+                                    Email is invalid
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="InputEmail">Phone</label>
+                        <label htmlFor="InputPhone">Phone</label>
                         <input type="text" className="form-control" value={phone} id="InputPhone" onChange={phoneChange} placeholder="Enter phone"></input>
+                        {validPhone ? (
+                            <></>
+                        ) : (
+                            <div>
+                                <div id="NameInvalid" className="form-text">
+                                    Phone is invalid
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="InputEmail">Address</label>
+                        <label htmlFor="InputAddress">Address</label>
                         <input type="text" className="form-control" value={address} id="InputAddress" onChange={addressChange} placeholder="Enter address"></input>
+                        {validAddress ? (
+                            <></>
+                        ) : (
+                            <div>
+                                <div id="NameInvalid" className="form-text">
+                                    Address is invalid
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button type="button" className="btn btn-primary" onClick={addContact}>Save</button>

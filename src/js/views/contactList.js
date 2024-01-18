@@ -4,11 +4,12 @@ import ContactCard from "../component/ContactCard.jsx"
 
 
 export const ContactList = () => {
-	const { store: { contacts }, actions: { loadContacts } } = useContext(Context)
+	const { store: { contacts }, actions: { loadContacts, setCurrentContact } } = useContext(Context)
 
 	useEffect(() => {
 		loadContacts()
-	})
+		setCurrentContact("")
+	}, [contacts])
 
 	return (
 		<div className="text-center mt-5">
